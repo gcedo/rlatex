@@ -20,6 +20,6 @@ The above command will produce the following:
 Other options are:
 
 *    `--language`, set to english as default
-*    `--date`, set to \today as defaul
+*    `--date`, set to \today as default
 
-The --sections options allow multiple values, but it cannot preceed the project name.
+The --sections option allows multiple values, but it cannot preceed the project name.
