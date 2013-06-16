@@ -43,9 +43,7 @@ class LatexCreator
       f.write("\\begin{document}\n\n")
       f.write("\\maketitle\n")
       f.write("  %%% INPUT\n")
-      @sections.each do |section|
-        f.write("  \\input{contents/#{section}.tex}\n")
-      end
+      @sections.each { |s| f.write("  \\input{contents/#{s}.tex}\n") } unless @sections.nil?
 
       f.write("\\end{document}\n")
       f.write("\n")
@@ -53,9 +51,7 @@ class LatexCreator
   end
 
   def create_sections()
-    @sections.each do |section|
-      create_section section
-    end
+    @sections.each { |section| create_section section } unless @sections.nil?
   end
 
   def create_section(section)
