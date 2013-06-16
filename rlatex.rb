@@ -18,9 +18,11 @@ class LatexCreator
       @font_size = font_size
       @class = dclass
       @sections = sections
+
       FileUtils.mkdir name
       FileUtils.mkdir "#{name}/contents"
       FileUtils.mkdir "#{name}/pictures"
+
       create_main_tex()
       create_sections()
     else
@@ -30,23 +32,22 @@ class LatexCreator
 
   def create_main_tex()
     File.open("#{@name}/main.tex", 'w') do |f|
-      f.write("\\documentclass[#{@font_size}]{#{@class}}\n\n")
+      f.puts "\\documentclass[#{@font_size}]{#{@class}}\n"
 
-      f.write("%%% PACKAGES\n")
+      f.puts "%%% PACKAGES"
       write_packages(f)
-      f.write("\n")
+      f.puts
 
-      f.write("%%% META\n")
+      f.puts "%%% META"
       write_meta(f)
-      f.write("\n")
+      f.puts
 
-      f.write("\\begin{document}\n\n")
-      f.write("\\maketitle\n")
-      f.write("  %%% INPUT\n")
-      @sections.each { |s| f.write("  \\input{contents/#{s}.tex}\n") } unless @sections.nil?
+      f.puts "\\begin{document}\n"
+      f.puts "\\maketitle"
+      f.puts "  %%% INPUT"
+      @sections.each { |s| f.puts "  \\input{contents/#{s}.tex}" } unless @sections.nil?
 
-      f.write("\\end{document}\n")
-      f.write("\n")
+      f.puts("\\end{document}\n")
     end
   end
 
@@ -56,24 +57,25 @@ class LatexCreator
 
   def create_section(section)
     File.open("#{@name}/contents/#{section}.tex", 'w') do |f|
-      f.write("\\section{#{section.tr('_',' ').titlecase}}\n")
-      f.write("\\label{sec:#{section}\n")
+      f.puts "\\section{#{section.tr('_',' ').titlecase}}\n"
+      f.puts "\\label{sec:#{section}}\n"
     end
   end
 
   def write_meta(file)
-    file.write("\\author{#{@author}}\n")
-    file.write("\\title{#{@title}}\n")
-    file.write("\\date{#{@date}}\n")
+    file.puts "\\author{#{@author}}"
+    file.puts "\\title{#{@title}}"
+    file.puts "\\date{#{@date}}"
   end
 
   def write_packages(file)
-    file.write("\\usepackage[#{@language}]{babel}\n")
-    file.write("\\usepackage{asmmath}\n")
-    file.write("\\usepackage{asmmsymb}\n")
-    file.write("\\usepackage{graphicx}\n")
-    file.write("\\usepackage{booktabs}\n")
-    file.write("\\usepackage{tikz}\n")
+    file.puts "\\usepackage[#{@language}]{babel}"
+    file.puts "\\usepackage{asmmath}"
+    file.puts "\\usepackage{asmmsymb}"
+    file.puts "\\usepackage{graphicx}"
+    file.puts "\\graphicspath{ {pictures/} }"
+    file.puts "\\usepackage{booktabs}"
+    file.puts "\\usepackage{tikz}"
   end
 
 end
@@ -91,13 +93,13 @@ creator = LatexCreator.new
 o = case cmd
   when "new"
     Trollop::options do
-     opt :author, "Document author", :default => ""
-     opt :title, "Document title", :default => "Document Title"
-     opt :date, "Document date", :default => "\\today"
-     opt :font_size, "Font size", :default => "10pt"
-     opt :language, "Language", :default => "english"
-     opt :class, "Document class", :default => "article"
-     opt :sections, "Document sections", :type => :strings
+      opt :class, "Document class", :default => "article"
+      opt :sections, "Document sections", :type => :strings
+      opt :author, "Document author", :default => ""
+      opt :title, "Document title", :default => "Document Title"
+      opt :date, "Document date", :default => "\\today"
+      opt :font_size, "Font size", :default => "10pt"
+      opt :language, "Language", :default => "english"
     end
   end
 
