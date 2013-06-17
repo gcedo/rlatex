@@ -8,7 +8,7 @@ require 'facets/string/titlecase'
 SUB_COMMANDS = %w{new}
 
 class LatexCreator
-  def new_project(name, author, title, date, font_size, language, dclass, sections)
+  def new_project(name, author, title, date, font_size, language, dclass, sections, packages)
     if not File.exists? name
       @name = name
       @author = author
@@ -18,6 +18,7 @@ class LatexCreator
       @font_size = font_size
       @class = dclass
       @sections = sections
+      @packages = packages
 
       FileUtils.mkdir name
       FileUtils.mkdir "#{name}/contents"
@@ -103,7 +104,8 @@ class LatexCreator
     file.puts "\\usepackage{graphicx}"
     file.puts "\\graphicspath{ {pictures/} }"
     file.puts "\\usepackage{booktabs}"
-    file.puts "\\usepackage{tikz}"
+    #file.puts "\\usepackage{tikz}"
+    @packages.each { |pkg| file.puts "\\usepackage{#{pkg}}"} unless @packages.nil?
   end
 
   def compile(file = "main.tex")
@@ -134,7 +136,7 @@ end
 cmd = ARGV.shift
 creator = LatexCreator.new
 
-o = case cmd
+options = case cmd
   when "new"
     Trollop::options do
       opt :class, "Document class", :default => "article"
@@ -144,6 +146,7 @@ o = case cmd
       opt :date, "Document date", :default => "\\today"
       opt :font_size, "Font size", :default => "10pt"
       opt :language, "Language", :default => "english"
+      opt :packages, "Extra packages", :type => :strings
     end
   end
 
@@ -151,16 +154,15 @@ case cmd
 when "new"
   name = ARGV.shift
   creator.new_project(name,
-                      o[:author],
-                      o[:title],
-                      o[:date],
-                      o[:font_size],
-                      o[:language],
-                      o[:class],
-                      o[:sections])
+                      options[:author],
+                      options[:title],
+                      options[:date],
+                      options[:font_size],
+                      options[:language],
+                      options[:class],
+                      options[:sections],
+                      options[:packages])
 when "compile"
   file = ARGV.shift
   if file.nil? then creator.compile else creator.compile file end
 end
-
-
