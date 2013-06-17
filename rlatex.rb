@@ -76,7 +76,6 @@ class LatexCreator
     file.puts "\\label{subsec:#{subsection}}"
     file.puts
     file.puts "% subsection #{subsection} (end)"
-    file.puts
   end
 
   def parse_heading(heading)
