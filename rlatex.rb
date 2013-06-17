@@ -80,8 +80,12 @@ class LatexCreator
     @sections.each { |section| create_section section } unless @sections.nil?
   end
 
+  def parse_section_name(section_name)
+    section_name.strip.gsub(/\s+/, "_")
+  end
+
   def create_section(section)
-    section_name = section.split("/")[0]
+    section_name = parse_section_name(section.split("/")[0])
     subsections = section.split("/")[1].split(",") unless section.split("/")[1].nil?
 
     File.open("#{@name}/contents/#{section_name}.tex", 'w') do |f|
@@ -107,7 +111,7 @@ class LatexCreator
 
   def write_sections(sections, file)
     sections.each do |section|
-      section_name = section.split("/")[0]
+      section_name = parse_section_name(section.split("/")[0])
       file.puts "  \\input{contents/#{section_name}.tex}\n"
     end
   end
