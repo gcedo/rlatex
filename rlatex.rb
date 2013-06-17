@@ -32,7 +32,8 @@ class LatexCreator
 
   def create_main_tex()
     File.open("#{@name}/main.tex", 'w') do |f|
-      f.puts "\\documentclass[#{@font_size}]{#{@class}}\n"
+      f.puts "\\documentclass[#{@font_size}]{#{@class}}"
+      f.puts
 
       f.puts "%%% PACKAGES"
       write_packages(f)
@@ -42,12 +43,13 @@ class LatexCreator
       write_meta(f)
       f.puts
 
-      f.puts "\\begin{document}\n"
+      f.puts "\\begin{document}"
+      f.puts
       f.puts "\\maketitle"
       f.puts "  %%% INPUT"
       write_sections @sections, f unless @sections.nil?
 
-      f.puts("\\end{document}\n")
+      f.puts("\\end{document}")
     end
   end
 
@@ -60,13 +62,25 @@ class LatexCreator
     subsections = section.split("/")[1].split(",") unless section.split("/")[1].nil?
 
     File.open("#{@name}/contents/#{section_name}.tex", 'w') do |f|
-      f.puts "\\section{#{section_name.tr('_',' ').titlecase}}\n"
-      f.puts "\\label{sec:#{section_name}}\n"
+      f.puts "\\section{#{section_name.tr('_',' ').titlecase}}"
+      f.puts "\\label{sec:#{section_name}}"
+      f.puts
       subsections.each { |subsection| create_subsection subsection, f } unless subsections.nil?
+      f.puts
+      f.puts "% section #{section_name} (end)"
     end
   end
 
   def create_subsection(subsection, file)
+    file.puts "\\subsection{#{parse_heading(subsection)}}"
+    file.puts "\\label{subsec:#{subsection}}"
+    file.puts
+    file.puts "% subsection #{subsection} (end)"
+    file.puts
+  end
+
+  def parse_heading(heading)
+    heading.tr('_', ' ').titlecase
   end
 
   def write_sections(sections, file)
