@@ -45,6 +45,10 @@ class LatexCreator
       write_meta(f)
       f.puts
 
+      f.puts "%%% HYPERREF OPTIONS"
+      write_hypersetup(f)
+      f.puts
+
       f.puts "\\begin{document}"
       f.puts
       f.puts "\\maketitle"
@@ -97,6 +101,15 @@ class LatexCreator
     file.puts "\\date{#{@date}}"
   end
 
+  def write_hypersetup(file)
+    file.puts "\\makeatletter"
+    file.puts "\\hypersetup{"
+    file.puts "    colorlinks, linkcolor=black, urlcolor=black,"
+    file.puts "    pdftitle={\\@title},"
+    file.puts "    pdfauthor={\\@author},"
+    file.puts "}\n\\makeatother"
+  end
+
   def write_packages(file)
     file.puts "\\usepackage[#{@language}]{babel}"
     file.puts "\\usepackage{amsmath}"
@@ -105,6 +118,7 @@ class LatexCreator
     file.puts "\\graphicspath{ {pictures/} }"
     file.puts "\\usepackage{booktabs}"
     file.puts "\\usepackage{tikz}"
+    file.puts "\\usepackage{hyperref}"
     @packages.each { |pkg| file.puts "\\usepackage{#{pkg}}"} unless @packages.nil?
   end
 
