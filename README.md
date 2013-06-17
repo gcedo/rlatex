@@ -8,7 +8,7 @@ v 1.0
 ======
 Hooray! v 1.0 is out! Here below you can find its basic (and so far also complete) usage:
 
-    $ ruby rlatex.rb new --author "Edoardo Colombo" --title "My ruby latex manager" --sections my_fist_section foo
+    $ ruby rlatex.rb new --author "Edoardo Colombo" --sections my_fist_section --title "My ruby latex manager" foo
 
 The above command will produce the following:
 
@@ -20,6 +20,6 @@ The above command will produce the following:
 Other options are:
 
 *    `--language`, set to english as default
-*    `--date`, set to \today as defaul
+*    `--date`, set to \today as default
 
-The --sections options allow multiple values, but it cannot preceed the project name.
+The --sections option allows multiple values, but it cannot preceed the project name.
