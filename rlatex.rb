@@ -5,7 +5,24 @@ require 'fileutils'
 require 'trollop'
 require 'facets/string/titlecase'
 
+VERSION = "1.2"
 SUB_COMMANDS = %w{new}
+HELP = <<-EOS
+This is rlatex #{VERSION}, a ruby command line utility for LaTeX projects scaffolding.
+
+Usage:
+        ruby rlatex.rb <COMMAND> [OPTIONS]
+where <COMMAND> can be:
+  new <project> [OPTIONS]: creates the project scaffolding.
+  It accepts the following options:
+      --class <CLASS>, to specify the document class. Default is set to article.
+      --sections <SECTIONS>, to specify the sections and subsections.
+      --author <AUTHOR>, to specify the author.
+      --title <TITLE>, to specify the document title.
+      --date <DATE>, to specify the date, default set to \\today
+      --font-size <SIZE>, format allowed: <SIZE>pt, e.g. 11pt
+      --packages <PACKAGES>, to add extra packages
+EOS
 
 class LatexCreator
   def new_project(name, author, title, date, font_size, language, dclass, sections, packages)
@@ -128,12 +145,16 @@ end
 
 # Commands parsing
 global_opts = Trollop::options do
-  version "0.0 2013 Edoardo Colombo"
+  version "#{VERSION} 2013 Edoardo Colombo"
   banner "LaTeX scaffolding"
   stop_on SUB_COMMANDS
 end
 
 cmd = ARGV.shift
+
+if cmd.nil?
+  abort(HELP)
+end
 creator = LatexCreator.new
 
 options = case cmd
