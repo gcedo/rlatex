@@ -45,7 +45,7 @@ class LatexCreator
       f.puts "\\begin{document}\n"
       f.puts "\\maketitle"
       f.puts "  %%% INPUT"
-      @sections.each { |s| f.puts "  \\input{contents/#{s}.tex}" } unless @sections.nil?
+      write_sections @sections, f unless @sections.nil?
 
       f.puts("\\end{document}\n")
     end
@@ -56,9 +56,23 @@ class LatexCreator
   end
 
   def create_section(section)
-    File.open("#{@name}/contents/#{section}.tex", 'w') do |f|
-      f.puts "\\section{#{section.tr('_',' ').titlecase}}\n"
-      f.puts "\\label{sec:#{section}}\n"
+    section_name = section.split("/")[0]
+    subsections = section.split("/")[1].split(",") unless section.split("/")[1].nil?
+
+    File.open("#{@name}/contents/#{section_name}.tex", 'w') do |f|
+      f.puts "\\section{#{section_name.tr('_',' ').titlecase}}\n"
+      f.puts "\\label{sec:#{section_name}}\n"
+      subsections.each { |subsection| create_subsection subsection, f } unless subsections.nil?
+    end
+  end
+
+  def create_subsection(subsection, file)
+  end
+
+  def write_sections(sections, file)
+    sections.each do |section|
+      section_name = section.split("/")[0]
+      file.puts "\\input{#{section_name}.tex}\n"
     end
   end
 
