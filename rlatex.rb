@@ -22,6 +22,7 @@ class LatexCreator
       FileUtils.mkdir name
       FileUtils.mkdir "#{name}/contents"
       FileUtils.mkdir "#{name}/pictures"
+      FileUtils.mkdir "#{name}/output"
 
       create_main_tex()
       create_sections()
@@ -105,6 +106,22 @@ class LatexCreator
     file.puts "\\usepackage{tikz}"
   end
 
+  def compile(file = "main.tex")
+    if pdflatex_is_found?
+      system("pdflatex --output-directory=output #{file}")
+    else
+      puts "pdflatex not found."
+    end
+  end
+
+  def pdflatex_is_found?()
+    ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+      exe = File.join(path, "pdflatex")
+      return true if File.executable? exe
+    end
+    return false
+  end
+
 end
 
 # Commands parsing
@@ -141,4 +158,9 @@ when "new"
                       o[:language],
                       o[:class],
                       o[:sections])
+when "compile"
+  file = ARGV.shift
+  if file.nil? then creator.compile else creator.compile file end
 end
+
+
