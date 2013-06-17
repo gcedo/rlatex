@@ -62,7 +62,7 @@ class LatexCreator
     subsections = section.split("/")[1].split(",") unless section.split("/")[1].nil?
 
     File.open("#{@name}/contents/#{section_name}.tex", 'w') do |f|
-      f.puts "\\section{#{section_name.tr('_',' ').titlecase}}"
+      f.puts "\\section{#{parse_heading(section_name)}}"
       f.puts "\\label{sec:#{section_name}}"
       f.puts
       subsections.each { |subsection| create_subsection subsection, f } unless subsections.nil?
@@ -85,7 +85,7 @@ class LatexCreator
   def write_sections(sections, file)
     sections.each do |section|
       section_name = section.split("/")[0]
-      file.puts "\\input{#{section_name}.tex}\n"
+      file.puts "  \\input{#{section_name}.tex}\n"
     end
   end
 
