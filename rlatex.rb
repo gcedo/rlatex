@@ -104,7 +104,7 @@ class LatexCreator
     file.puts "\\usepackage{graphicx}"
     file.puts "\\graphicspath{ {pictures/} }"
     file.puts "\\usepackage{booktabs}"
-    #file.puts "\\usepackage{tikz}"
+    file.puts "\\usepackage{tikz}"
     @packages.each { |pkg| file.puts "\\usepackage{#{pkg}}"} unless @packages.nil?
   end
 
