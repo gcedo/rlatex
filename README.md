@@ -4,6 +4,15 @@ rlatex
 rlatex is a ruby script for LaTeX scaffolding. It creates the directory and document hierarchy, keeping everything nice 
 and tidy. Save time and efforts in creating LaTeX documents, use a good standard for every project.
 
+v 1.2
+======
+Added `compile` command to compile using `pdflatex`, if installed:
+
+    $ ruby rlatex.rb compile
+
+all of the output files are stored in the `output` folder, keeping the main directory clean.
+Added the `--packages` option, which allows you to add extra packages.
+
 v 1.1
 ======
 Kudos to [spinatelli](https://github.com/spinatelli "spinatelli") for the pull request. Even though I didn't merge
