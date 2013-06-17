@@ -10,18 +10,18 @@ SUB_COMMANDS = %w{new}
 HELP = <<-EOS
 This is rlatex #{VERSION}, a ruby command line utility for LaTeX projects scaffolding.
 
-Usage:
-        ruby rlatex.rb <COMMAND> [OPTIONS]
-where <COMMAND> can be:
-  new <project> [OPTIONS]: creates the project scaffolding.
+usage: ruby rlatex.rb <command> [options]
+where <command> can be:
+
+  new <project> [options]: creates the project scaffolding.
   It accepts the following options:
-      --class <CLASS>, to specify the document class. Default is set to article.
-      --sections <SECTIONS>, to specify the sections and subsections.
-      --author <AUTHOR>, to specify the author.
-      --title <TITLE>, to specify the document title.
-      --date <DATE>, to specify the date, default set to \\today
-      --font-size <SIZE>, format allowed: <SIZE>pt, e.g. 11pt
-      --packages <PACKAGES>, to add extra packages
+      --class <class>, to specify the document class. Default is set to article.
+      --sections <sections>, to specify the sections and subsections.
+      --author <author>, to specify the author.
+      --title <title>, to specify the document title.
+      --date <date>, to specify the date, default set to \\today
+      --font-size <size>, format allowed: <SIZE>pt, e.g. 11pt
+      --packages <packages>, to add extra packages
 EOS
 
 class LatexCreator
