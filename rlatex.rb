@@ -85,7 +85,7 @@ class LatexCreator
   def write_sections(sections, file)
     sections.each do |section|
       section_name = section.split("/")[0]
-      file.puts "  \\input{#{section_name}.tex}\n"
+      file.puts "  \\input{contents/#{section_name}.tex}\n"
     end
   end
 
@@ -97,8 +97,8 @@ class LatexCreator
 
   def write_packages(file)
     file.puts "\\usepackage[#{@language}]{babel}"
-    file.puts "\\usepackage{asmmath}"
-    file.puts "\\usepackage{asmmsymb}"
+    file.puts "\\usepackage{amsmath}"
+    file.puts "\\usepackage{amssymb}"
     file.puts "\\usepackage{graphicx}"
     file.puts "\\graphicspath{ {pictures/} }"
     file.puts "\\usepackage{booktabs}"
