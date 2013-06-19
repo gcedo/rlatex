@@ -33,6 +33,10 @@ The above command creates:
     *   a subsection called `subsection_two`
 2. A section called `myothersection`
 
+### Add a Section
+
+    `$ ruby rlatex.rb add-section <new-section> --before <section>
+
 
 ### Other options
 
