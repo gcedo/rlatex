@@ -176,6 +176,8 @@ class LatexCreator
       end
       temp_file.rewind
       FileUtils.mv(temp_file.path, path)
+    rescue Errno::ENOENT
+      puts "File #{path} does not exist."
     ensure
       temp_file.close
       temp_file.unlink
