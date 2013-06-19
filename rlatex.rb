@@ -216,7 +216,7 @@ options = case cmd
 
 case cmd
 when "new"
-  name = ARGV.shift
+  abort(HELP) if (name = ARGV.shift).nil?
   creator.new_project(name,
                       options[:author],
                       options[:title],
