@@ -7,10 +7,10 @@ require 'trollop'
 require 'facets/string/titlecase'
 
 VERSION = "1.2"
-SUB_COMMANDS = %w{new add-package add-section}
+SUB_COMMANDS = %w{new add-package add-section compile}
 TEMP_FILE = "temp"
-PACKAGES_MARKER = "%%% packages (end)"
-SECTION_MARKER = "%%% sections (end)"
+PACKAGES_END_MARKER = "%%% packages (end)"
+SECTIONS_END_MARKER = "%%% sections (end)"
 HELP = <<-EOS
 This is rlatex #{VERSION}, a ruby command line utility for LaTeX projects scaffolding.
 
@@ -101,7 +101,6 @@ class LatexCreator
   def add_section(section, position)
     create_section section, "contents/"
     section_line = "\\input{contents/#{position[:section]}.tex}"
-    puts section_line
     if position[:place] == :before
       add_line_before section_line, "  \\input{contents/#{section}.tex}", "main.tex"
     end
@@ -110,7 +109,7 @@ class LatexCreator
   def write_sections(sections, file)
     sections.each do |section|
       section_name = parse_section_name(section.split("/")[0])
-      file.puts "  \\input{contents/#{section_name}.tex}\n"
+      file.puts "  \\input{contents/#{section_name}.tex}"
     end
     file.puts SECTION_MARKER
   end
@@ -147,11 +146,11 @@ class LatexCreator
     file.puts "\\usepackage{tikz}"
     file.puts "\\usepackage{hyperref}"
     @packages.each { |pkg| file.puts "\\usepackage{#{pkg}}"} unless @packages.nil?
-    file.puts PACKAGES_MARKER
+    file.puts PACKAGES_END_MARKER
   end
 
   def add_package(package)
-    add_line_before PACKAGES_MARKER, "\\usepackage{#{package}}", "main.tex"
+    add_line_before PACKAGES_END_MARKER, "\\usepackage{#{package}}", "main.tex"
   end
 
   def compile(file = "main.tex")
