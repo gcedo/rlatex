@@ -230,6 +230,6 @@ when "compile"
   file = ARGV.shift
   if file.nil? then creator.compile else creator.compile file end
 when "add-package"
-  package = ARGV.shift
+  abort(HELP) if (package = ARGV.shift).nil?
   creator.add_package package
 end
