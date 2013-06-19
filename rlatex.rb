@@ -111,7 +111,7 @@ class LatexCreator
       section_name = parse_section_name(section.split("/")[0])
       file.puts "  \\input{contents/#{section_name}.tex}"
     end
-    file.puts SECTION_MARKER
+    file.puts SECTIONS_END_MARKER
   end
 
   def create_subsection(subsection, file)
