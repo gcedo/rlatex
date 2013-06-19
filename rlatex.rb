@@ -206,10 +206,8 @@ global_opts = Trollop::options do
 end
 
 cmd = ARGV.shift
+abort(HELP) if cmd.nil?
 
-if cmd.nil?
-  abort(HELP)
-end
 creator = LatexCreator.new
 
 options = case cmd
