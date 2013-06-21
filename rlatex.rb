@@ -103,6 +103,8 @@ class LatexCreator
     section_line = "\\input{contents/#{position[:section]}.tex}"
     if position[:place] == :before
       add_line_before section_line, "  \\input{contents/#{section}.tex}", "main.tex"
+    else
+      add_line_after section_line, "  \\input{contents/#{section}.tex}", "main.tex"
     end
   end
 
@@ -177,13 +179,17 @@ class LatexCreator
     return false
   end
 
-  def add_line_before(line_to_be_found, line_to_be_inserted, path)
+  def add_line(line_to_be_found, line_to_be_inserted, path, position)
     temp_file = Tempfile.new(TEMP_FILE)
     begin
       lines = File.readlines(path)
       lines.each_cons(2) do |line, next_line|
         temp_file.puts line
-        temp_file.puts line_to_be_inserted if next_line.strip == line_to_be_found
+        if position == :before
+          temp_file.puts line_to_be_inserted if next_line.strip == line_to_be_found
+        else
+          temp_file.puts line_to_be_inserted if line.strip == line_to_be_found
+        end
         temp_file.puts next_line if next_line.equal? lines.last
       end
       temp_file.rewind
@@ -194,6 +200,14 @@ class LatexCreator
       temp_file.close
       temp_file.unlink
     end
+  end
+
+  def add_line_after(line_to_be_found, line_to_be_inserted, path)
+    add_line line_to_be_found, line_to_be_inserted, path, :after
+  end
+
+  def add_line_before(line_to_be_found, line_to_be_inserted, path)
+    add_line line_to_be_found, line_to_be_inserted, path, :before
   end
 
 end
