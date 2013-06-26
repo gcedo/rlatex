@@ -8,10 +8,11 @@ require 'facets/string/titlecase'
 require 'json'
 
 VERSION = "1.2"
-SUB_COMMANDS = %w{new add-package add-section compile}
+SUB_COMMANDS = %w{new add-package add-section compile templates}
 TEMP_FILE = "temp"
 PACKAGES_END_MARKER = "%%% packages (end)"
 SECTIONS_END_MARKER = "%%% sections (end)"
+TEMPLATES_DIR = "templates"
 HELP = <<-EOS
 This is rlatex #{VERSION}, a ruby command line utility for LaTeX projects scaffolding.
 
@@ -57,12 +58,23 @@ class LatexCreator
     end
   end
 
-  def load_template(file)
-    template = JSON.parse(IO.read file)
-    @class     = template["class"]     || @class
-    @font_size = template["font_size"] || @font_size
-    @sections  = template["sections"]
-    @language  = template["language"]
+  def load_template(template)
+    file = "#{TEMPLATES_DIR}/#{template}.json"
+    parsed_template = JSON.parse(IO.read file)
+    @class     = parsed_template["class"]     || @class
+    @font_size = parsed_template["font_size"] || @font_size
+    @sections  = parsed_template["sections"]
+    @language  = parsed_template["language"]
+  end
+
+  def show_templates()
+    Dir.foreach(TEMPLATES_DIR) do |filename|
+      extension = File.extname filename
+      if extension.eql? ".json"
+        description = JSON.parse(IO.read "#{TEMPLATES_DIR}/#{filename}")["description"]
+        puts "#{filename.delete '.json'}\t#{description}"
+      end
+    end
   end
 
   def create_main_tex()
@@ -284,4 +296,6 @@ when "add-section"
     position[:section], position[:place] = options[:after], :after
   end
   creator.add_section section, position
+when "templates"
+  creator.show_templates
 end
