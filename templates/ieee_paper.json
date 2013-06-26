@@ -1,0 +1,13 @@
+{
+    "description" : "IEEE template for conference papers.",
+    "class": "ieeetran",
+    "font_size": "11pt",
+    "language": "english",
+    "sections": [
+        "introduction",
+        "previous_work",
+        "problem_formulation",
+        "proposed_approach",
+        "conclusions_and_future_work"
+    ]
+}
