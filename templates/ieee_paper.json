@@ -1,6 +1,6 @@
 {
     "description" : "IEEE template for conference papers.",
-    "class": "ieeetran",
+    "class": "IEEEtran",
     "font_size": "11pt",
     "language": "english",
     "sections": [
