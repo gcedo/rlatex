@@ -1,3 +1,5 @@
+require 'rubygems'
+
 gem 'trollop'
 gem 'facets'
 
@@ -5,12 +7,14 @@ require 'fileutils'
 require 'tempfile'
 require 'trollop'
 require 'facets/string/titlecase'
+require 'json'
 
 VERSION = "1.2"
-SUB_COMMANDS = %w{new add-package add-section compile}
+SUB_COMMANDS = %w{new add-package add-section compile templates}
 TEMP_FILE = "temp"
 PACKAGES_END_MARKER = "%%% packages (end)"
 SECTIONS_END_MARKER = "%%% sections (end)"
+TEMPLATES_DIR = ENV['HOME'] + "/.rlatex/templates"
 HELP = <<-EOS
 This is rlatex #{VERSION}, a ruby command line utility for LaTeX projects scaffolding.
 
@@ -26,20 +30,42 @@ where <command> can be:
       --date <date>, to specify the date, default set to \\today
       --font-size <size>, format allowed: <SIZE>pt, e.g. 11pt
       --packages <packages>, to add extra packages
+      --template <template>, to use a template
+
+  add-section <section> [where]: adds a section to the document.
+  Valid "wheres" are:
+    --before <section>: inserts the new section before section.
+    --after <section>: inserts the new section after section.
+
+  templates: shows the available templates
+
+  compile: compile the LaTeX document and puts everything in the output directory.
 EOS
 
 class LatexCreator
-  def new_project(name, author, title, date, font_size, language, dclass, sections, packages)
+
+  def initialize
+    if not File.exists? ENV['HOME'] + '/.rlatex'
+      FileUtils.mkdir ENV['HOME'] + '/.rlatex'
+      FileUtils.mkdir ENV['HOME'] + '/.rlatex/templates'
+      File.new(ENV['HOME'] + '/.rlatex/conf', "w").close
+    end
+  end
+
+  def new_project(name, author, title, date, font_size, language, dclass, sections, packages, template)
     if not File.exists? name
       @name = name
-      @author = author
       @title = title
       @date = date
       @language = language
       @font_size = font_size
       @class = dclass
-      @sections = sections
       @packages = packages
+
+      load_template template if not template.nil?
+
+      @sections = @sections || sections
+      @author = author
 
       FileUtils.mkdir name
       FileUtils.mkdir "#{name}/contents"
@@ -53,7 +79,30 @@ class LatexCreator
     end
   end
 
-  def create_main_tex()
+  def load_template(template)
+    begin
+      file = "#{TEMPLATES_DIR}/#{template}.json"
+      parsed_template = JSON.parse(IO.read file)
+      @class     = parsed_template["class"]     || @class
+      @font_size = parsed_template["font_size"] || @font_size
+      @sections  = parsed_template["sections"]
+      @language  = parsed_template["language"]
+    rescue Errno::ENOENT
+      abort(HELP)
+    end
+  end
+
+  def show_templates
+    Dir.foreach(TEMPLATES_DIR) do |filename|
+      extension = File.extname filename
+      if extension.eql? ".json"
+        description = JSON.parse(IO.read "#{TEMPLATES_DIR}/#{filename}")["description"]
+        puts "#{filename.delete '.json'}\t#{description}"
+      end
+    end
+  end
+
+  def create_main_tex
     File.open("#{@name}/main.tex", 'w') do |f|
       f.puts "\\documentclass[#{@font_size}]{#{@class}}"
       f.puts
@@ -103,6 +152,8 @@ class LatexCreator
     section_line = "\\input{contents/#{position[:section]}.tex}"
     if position[:place] == :before
       add_line_before section_line, "  \\input{contents/#{section}.tex}", "main.tex"
+    else
+      add_line_after section_line, "  \\input{contents/#{section}.tex}", "main.tex"
     end
   end
 
@@ -169,7 +220,7 @@ class LatexCreator
     heading.tr('_', ' ').titlecase
   end
 
-  def pdflatex_is_found?()
+  def pdflatex_is_found?
     ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
       exe = File.join(path, "pdflatex")
       return true if File.executable? exe
@@ -177,13 +228,17 @@ class LatexCreator
     return false
   end
 
-  def add_line_before(line_to_be_found, line_to_be_inserted, path)
+  def add_line(line_to_be_found, line_to_be_inserted, path, position)
     temp_file = Tempfile.new(TEMP_FILE)
     begin
       lines = File.readlines(path)
       lines.each_cons(2) do |line, next_line|
         temp_file.puts line
-        temp_file.puts line_to_be_inserted if next_line.strip == line_to_be_found
+        if position == :before
+          temp_file.puts line_to_be_inserted if next_line.strip == line_to_be_found
+        else
+          temp_file.puts line_to_be_inserted if line.strip == line_to_be_found
+        end
         temp_file.puts next_line if next_line.equal? lines.last
       end
       temp_file.rewind
@@ -194,6 +249,14 @@ class LatexCreator
       temp_file.close
       temp_file.unlink
     end
+  end
+
+  def add_line_after(line_to_be_found, line_to_be_inserted, path)
+    add_line line_to_be_found, line_to_be_inserted, path, :after
+  end
+
+  def add_line_before(line_to_be_found, line_to_be_inserted, path)
+    add_line line_to_be_found, line_to_be_inserted, path, :before
   end
 
 end
@@ -221,6 +284,7 @@ options = case cmd
       opt :font_size, "Font size", :default => "10pt"
       opt :language, "Language", :default => "english"
       opt :packages, "Extra packages", :type => :strings
+      opt :template, "Document template", :type => :string
     end
   when"add-section"
     Trollop::options do
@@ -240,7 +304,8 @@ when "new"
                       options[:language],
                       options[:class],
                       options[:sections],
-                      options[:packages])
+                      options[:packages],
+                      options[:template])
 when "compile"
   file = ARGV.shift
   if file.nil? then creator.compile else creator.compile file end
@@ -256,4 +321,6 @@ when "add-section"
     position[:section], position[:place] = options[:after], :after
   end
   creator.add_section section, position
+when "templates"
+  creator.show_templates
 end
