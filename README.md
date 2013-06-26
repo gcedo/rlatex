@@ -23,7 +23,6 @@ The above command will produce the following:
 
 ### Subsectioning
 
-
     $ ruby rlatex.rb new foo --sections mysection/subsection_one,subsection_two myothersection
 
 The above command creates:
@@ -44,6 +43,7 @@ The above command creates:
 *    `--language`, set to english as default
 *    `--date`, set to \today as default
 *    `--packages` allows you to add extra packages.
+*    `--template` allows you to use a template to set up the project. Use the `templates` command to show the available templates.
 
 The --sections option allows multiple values, but it cannot preceed the project name.
 
@@ -65,7 +65,8 @@ The `compile` command to compile using `pdflatex`, if installed:
 
 all of the output files are stored in the `output` folder, keeping the main directory clean.
 
-
+# v 1.3
+Added the `--template` option, which allows to use a specific template to set up the document. Templates are simple .json files
 
 # v 1.2
 Added the `--packages` option, which allows you to add extra packages. Added the `add-package` command.
