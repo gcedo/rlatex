@@ -5,6 +5,7 @@ require 'fileutils'
 require 'tempfile'
 require 'trollop'
 require 'facets/string/titlecase'
+require 'json'
 
 VERSION = "1.2"
 SUB_COMMANDS = %w{new add-package add-section compile}
@@ -29,17 +30,20 @@ where <command> can be:
 EOS
 
 class LatexCreator
-  def new_project(name, author, title, date, font_size, language, dclass, sections, packages)
+  def new_project(name, author, title, date, font_size, language, dclass, sections, packages, template)
     if not File.exists? name
       @name = name
-      @author = author
       @title = title
       @date = date
       @language = language
       @font_size = font_size
       @class = dclass
-      @sections = sections
       @packages = packages
+
+      load_template template if not template.nil?
+
+      @sections = @sections || sections
+      @author = author
 
       FileUtils.mkdir name
       FileUtils.mkdir "#{name}/contents"
@@ -51,6 +55,14 @@ class LatexCreator
     else
       puts "Directory #{name} already exists. Please provide another name."
     end
+  end
+
+  def load_template(file)
+    template = JSON.parse(IO.read file)
+    @class     = template["class"]     || @class
+    @font_size = template["font_size"] || @font_size
+    @sections  = template["sections"]
+    @language  = template["language"]
   end
 
   def create_main_tex()
@@ -235,6 +247,7 @@ options = case cmd
       opt :font_size, "Font size", :default => "10pt"
       opt :language, "Language", :default => "english"
       opt :packages, "Extra packages", :type => :strings
+      opt :template, "Document template", :type => :string
     end
   when"add-section"
     Trollop::options do
@@ -254,7 +267,8 @@ when "new"
                       options[:language],
                       options[:class],
                       options[:sections],
-                      options[:packages])
+                      options[:packages],
+                      options[:template])
 when "compile"
   file = ARGV.shift
   if file.nil? then creator.compile else creator.compile file end
