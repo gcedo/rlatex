@@ -31,6 +31,14 @@ where <command> can be:
 EOS
 
 class LatexCreator
+
+  def initialize
+    if not File.exists? ENV['HOME'] + '/.rlatex'
+      FileUtils.mkdir ENV['HOME'] + '/.rlatex'
+      FileUtils.mkdir ENV['HOME'] + '/.rlatex/templates'
+    end
+  end
+
   def new_project(name, author, title, date, font_size, language, dclass, sections, packages, template)
     if not File.exists? name
       @name = name
@@ -67,7 +75,7 @@ class LatexCreator
     @language  = parsed_template["language"]
   end
 
-  def show_templates()
+  def show_templates
     Dir.foreach(TEMPLATES_DIR) do |filename|
       extension = File.extname filename
       if extension.eql? ".json"
@@ -77,7 +85,7 @@ class LatexCreator
     end
   end
 
-  def create_main_tex()
+  def create_main_tex
     File.open("#{@name}/main.tex", 'w') do |f|
       f.puts "\\documentclass[#{@font_size}]{#{@class}}"
       f.puts
@@ -195,7 +203,7 @@ class LatexCreator
     heading.tr('_', ' ').titlecase
   end
 
-  def pdflatex_is_found?()
+  def pdflatex_is_found?
     ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
       exe = File.join(path, "pdflatex")
       return true if File.executable? exe
