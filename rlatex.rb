@@ -1,3 +1,5 @@
+require 'rubygems'
+
 gem 'trollop'
 gem 'facets'
 
@@ -12,7 +14,7 @@ SUB_COMMANDS = %w{new add-package add-section compile templates}
 TEMP_FILE = "temp"
 PACKAGES_END_MARKER = "%%% packages (end)"
 SECTIONS_END_MARKER = "%%% sections (end)"
-TEMPLATES_DIR = "templates"
+TEMPLATES_DIR = ENV['HOME'] + "/.rlatex/templates"
 HELP = <<-EOS
 This is rlatex #{VERSION}, a ruby command line utility for LaTeX projects scaffolding.
 
@@ -28,6 +30,16 @@ where <command> can be:
       --date <date>, to specify the date, default set to \\today
       --font-size <size>, format allowed: <SIZE>pt, e.g. 11pt
       --packages <packages>, to add extra packages
+      --template <template>, to use a template
+
+  add-section <section> [where]: adds a section to the document.
+  Valid "wheres" are:
+    --before <section>: inserts the new section before section.
+    --after <section>: inserts the new section after section.
+
+  templates: shows the available templates
+
+  compile: compile the LaTeX document and puts everything in the output directory.
 EOS
 
 class LatexCreator
@@ -36,6 +48,7 @@ class LatexCreator
     if not File.exists? ENV['HOME'] + '/.rlatex'
       FileUtils.mkdir ENV['HOME'] + '/.rlatex'
       FileUtils.mkdir ENV['HOME'] + '/.rlatex/templates'
+      File.new(ENV['HOME'] + '/.rlatex/conf', "w").close
     end
   end
 
@@ -67,12 +80,16 @@ class LatexCreator
   end
 
   def load_template(template)
-    file = "#{TEMPLATES_DIR}/#{template}.json"
-    parsed_template = JSON.parse(IO.read file)
-    @class     = parsed_template["class"]     || @class
-    @font_size = parsed_template["font_size"] || @font_size
-    @sections  = parsed_template["sections"]
-    @language  = parsed_template["language"]
+    begin
+      file = "#{TEMPLATES_DIR}/#{template}.json"
+      parsed_template = JSON.parse(IO.read file)
+      @class     = parsed_template["class"]     || @class
+      @font_size = parsed_template["font_size"] || @font_size
+      @sections  = parsed_template["sections"]
+      @language  = parsed_template["language"]
+    rescue Errno::ENOENT
+      abort(HELP)
+    end
   end
 
   def show_templates
